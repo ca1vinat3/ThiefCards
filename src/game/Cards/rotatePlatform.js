@@ -1,39 +1,97 @@
 
+
 export class rotatePlatform {
-  constructor(scene, x, y, self ,pointx,pointy,radius,texture) {
+  constructor(scene,plaforms, x, y, self ,pointx,pointy,objectInteractive,areaInteractive,radius,texture) {
 
     this.scene = scene;
     this.x = x;
     this.y = y;
     this.self = self;
+    this.myplatforms = plaforms;
     this.pointX = pointx;
     this.pointY = pointy;
-    this.radius = radius
+    this.radius = radius;
+    this.objectInteractive = objectInteractive;
+    this.areaInteractive = areaInteractive;
     this.localRotate = false;
     this.holdRigth = false;
     this.holdLeft = false;
     this.angle = 3;  
-    this.createPlatforms(scene);
-    this.createEventHandlers(scene);
+    this.createPlatforms(scene,this.myplatforms);
+   // this.createEventHandlers(scene);
   
 
   }
 
-  createPlatforms(scene) {
+  createPlatforms(scene,platforms) {
 
-  this.platform = this.scene.add.sprite(this.x, this.y, 'platform');
+     for(let i = 0; i < platforms.length; i++) {
+      
+        let platform = platforms[i];
+        platform.setInteractive();
+
+        let dragStartAngle = 0;
+        let isDragging = false;
+    
+    
+    if(this.objectInteractive) {
+     
+      this.scene.input.on('dragstart', (pointer, gameObject) => {
+        if (gameObject === platform) {
+            isDragging = true;
+          // Store the initial angle relative to the pointer
+          dragStartAngle = Phaser.Math.Angle.Between(pointer.x, pointer.y, platform.x, platform.y) - platform.rotation;
+        }
+      });
+    
+      this.scene.input.on('drag', (pointer, gameObject) => {
+        if (gameObject === platform) {
+            isDragging = true;
+          // Calculate the new angle based on pointer position
+          let angle = Phaser.Math.Angle.Between(pointer.x, pointer.y, platform.x, platform.y) - dragStartAngle;
+    
+          // Update the platform's rotation
+          platform.setRotation(angle);
+        }
+      });
+    
+      
+    }
+    
+    if(this.areaInteractive) {
+    
+    this.scene.input.on('pointerdown', (pointer) => {
+        
+        isDragging = false;
+        // Calculate the initial angle difference between pointer and platform
+       dragStartAngle = Phaser.Math.Angle.Between(pointer.x, pointer.y, platform.x, platform.y) - platform.rotation;
+      });
+    
+      // End drag on pointer up
+      this.scene.input.on('pointerup', () => {
+        isDragging = false;
+      });
+    
+      // Rotate platform while dragging
+      this.scene.input.on('pointermove', (pointer) => {
+        if (!isDragging) {
+          // Calculate the new angle
+          let angle = Phaser.Math.Angle.Between(pointer.x, pointer.y, platform.x, platform.y) - dragStartAngle;
+    
+          // Update the platform's rotation
+         platform.setRotation(angle);
+        }
+      });
+    
+    
+    
+    }
 
 
-  this.scene.matter.add.gameObject(this.platform, {
-    shape: { type: 'rectangle', width:200, height: 50 }, 
-    restitution: 0.8, 
-  });
 
-  this.platform.setIgnoreGravity(true);
-  this.platform.setStatic(true);
-  //this.platform.setOrigin(0,1);
-  //this.platform.setRotation(Phaser.Math.DegToRad(45));
-
+     };
+  
+   
 }
 
 createEventHandlers(scene) {

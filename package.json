@@ -1,0 +1,28 @@
+{
+  "name": "vue-phaser3",
+  "version": "3.2.1",
+  "description": "cards",
+  "author": "calvin",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "start": "http-server dist --port=5000"
+  },
+  "dependencies": {
+    "core-js": "^3.38.1",
+    "phaser": "^3.85.2",
+    "vue": "^3.5.11"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "http-server": "^14.1.1",
+    "sass": "^1.79.5",
+    "sass-loader": "^16.0.2"
+  },
+  "keywords": [
+    "vue",
+    "phaser",
+    "webpack"
+  ]
+}

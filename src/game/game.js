@@ -4,7 +4,7 @@ import PlayScene from '@/game/scenes/PlayScene'
 
 function launch(containerId) {
   return new Phaser.Game({
-    type: Phaser.AUTO,
+    type: Phaser.WEBGL,
     width: 800,
     height: 600,
     parent: containerId,
@@ -12,9 +12,12 @@ function launch(containerId) {
       default: 'matter',
       matter: {
         gravity: { y: 1 },
-        debug: true
+        debug: false
       }
     },
+    render: {
+      context: 'webgl2'
+  },
     scene: [BootScene, PlayScene]
   })
 }

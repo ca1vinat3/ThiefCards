@@ -1,40 +1,21 @@
 
 
 export class rotatePlatform {
-  constructor(scene,plaforms, x, y, self ,pointx,pointy,objectInteractive,areaInteractive,radius,texture) {
+  constructor(scene,plaforms, x, y,objectInteractive,areaInteractive,texture) {
 
     this.scene = scene;
     this.x = x;
     this.y = y;
-    this.self = self;
     this.myplatforms = plaforms;
-    this.pointX = pointx;
-    this.pointY = pointy;
-    this.radius = radius;
     this.objectInteractive = objectInteractive;
     this.areaInteractive = areaInteractive;
-    this.localRotate = false;
-    this.holdRigth = false;
-    this.holdLeft = false;
-    this.angle = 3;  
-   // this.createPlatformParent(scene);
-    this.createPlatforms(scene,this.myplatforms);
-   // this.createEventHandlers(scene);
+    this.rotatePlatforms(scene,this.myplatforms);
   
 
   }
 
 
- createPlatformParent(scene) {
-
- this.platformParent = this.scene.add.container();
-
-    for (let i = 0; i < this.myplatforms.length; i++) {
-      let platform = this.myplatforms[i];
-      this.platformParent.add(platform);
-    }
-}
-  createPlatforms(scene, platforms) {
+  rotatePlatforms(scene, platforms) {
     let isDragging = false;
     let currentPlatform = null; // Tracks the platform being dragged
     let angle = 0;
@@ -128,37 +109,13 @@ export class rotatePlatform {
     }
 }
   }
-createEventHandlers(scene) {
-
-    this.scene.input.on('pointerdown', this.handleControlOn, this);
-    this.scene.input.on('pointerup', this.handleControlOff, this);
-}
-
-handleControlOn(pointer) {
-
-    if (pointer.x > 400) {
-        this.holdRigth = true;
-        this.holdLeft = false;
-    } else {
-        this.holdLeft = true;
-        this.holdRigth = false;
-    }
-    
-}
-
-handleControlOff() {
-
-    this.holdRigth = false;
-    this.holdLeft = false;
-}
- 
 
 
-updatePlatform(){
 
-    
 
-}
+
+
+
 
 
 

@@ -8,16 +8,18 @@ export default class PlayScene extends Scene {
     this.platforms = [];
   }
 
+
+
   create () {
     this.add.image(400, 300, 'background');
 
 
     let rows = 4; // Number of rows
     let cols = 4; // Number of columns
-    let spacingX = 150; // Horizontal spacing between platforms
-    let spacingY = 150; // Vertical spacing between platforms
-    let startX = 200; // Starting X position
-    let startY = 100; // Starting Y position
+    let spacingX = 300; // Horizontal spacing between platforms
+    let spacingY =100; // Vertical spacing between platforms
+    let startX = 0; // Starting X position
+    let startY = 300; // Starting Y position
 
 
     for (let row = 0; row < rows; row++) {
@@ -29,7 +31,8 @@ export default class PlayScene extends Scene {
         // Create the platform sprite
         let platform = this.add.sprite(x, y, 'platform');
 
-
+          platform.setDisplaySize(200, 50);
+        
         this.matter.add.gameObject(platform, {
           shape: { type: 'rectangle', width:200, height: 50 }, 
           restitution: 0.8, 
@@ -47,12 +50,16 @@ export default class PlayScene extends Scene {
         this.platforms.push(platform);
       }
     }
+
     
-    this.myRotatingPlatforms = new rotatePlatform(this,this.platforms, 400, 300,true,null,null,true,true,null);
+    
+    this.myRotatingPlatforms = new rotatePlatform(this,this.platforms, 400, 300,true,true,null);
+
+    this.myThief = new ball(this, 400, 200, 'thief');
 
     this.matter.world.setBounds(0, 0, this.scale.width, this.scale.height);
   
-    this.myThief = new ball(this, 400, 200, 'bomb');
+
 
   
 

@@ -38,7 +38,7 @@
           const totalParticles = 10;
           const outwardForce = 0.0003;
           const restoringForce = 0.0003;
-          const damping = 0.9;
+          const damping = 1;
 
           this.particles = [];
 
@@ -49,12 +49,12 @@
         // Generate edge particles in a circular arrangement
         for (let i = 0; i < totalParticles; i++) {
           const angle = (i / totalParticles) * Math.PI * 2;
-          const x = this.centerX + radius * Math.cos(angle);
-          const y = this.centerY + radius * Math.sin(angle);
+          const x = center.position.x + radius * Math.cos(angle);
+          const y = center.position.y + radius * Math.sin(angle);
 
           const particle = this.scene.matter.add.circle(x, y, particleRadius, {
-              restitution: 0.8,
-              friction: 0.1,
+              restitution: 1,
+              friction: 1,
               frictionAir: damping
           });
           this.particles.push(particle);
@@ -65,7 +65,7 @@
           const particleA = this.particles[i];
           const particleB = this.particles[(i % totalParticles) + 1];
           this.scene.matter.add.constraint(particleA, particleB, 50* scaleFactor , 1); // Edge-to-edge
-          this.scene.matter.add.constraint(center, particleA, radius, 0.05); // Center-to-edge
+          this.scene.matter.add.constraint(center, particleA, radius, 0.2); // Center-to-edge
         }
 
 

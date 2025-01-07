@@ -43,14 +43,14 @@
           this.particles = [];
 
         // Create a central particle
-        const center = this.scene.matter.add.circle(this.centerX, this.centerY,  5 * scaleFactor, { isStatic: false });
-        this.particles.push(center); // Add the center to particles array
+        this.center = this.scene.matter.add.circle(this.centerX, this.centerY,  5 * scaleFactor, { isStatic: false });
+        this.particles.push(this.center); // Add the center to particles array
 
         // Generate edge particles in a circular arrangement
         for (let i = 0; i < totalParticles; i++) {
           const angle = (i / totalParticles) * Math.PI * 2;
-          const x = center.position.x + radius * Math.cos(angle);
-          const y = center.position.y + radius * Math.sin(angle);
+          const x = this.center.position.x + radius * Math.cos(angle);
+          const y = this.center.position.y + radius * Math.sin(angle);
 
           const particle = this.scene.matter.add.circle(x, y, particleRadius, {
               restitution: 1,
@@ -65,7 +65,7 @@
           const particleA = this.particles[i];
           const particleB = this.particles[(i % totalParticles) + 1];
           this.scene.matter.add.constraint(particleA, particleB, 50* scaleFactor , 1); // Edge-to-edge
-          this.scene.matter.add.constraint(center, particleA, radius, 0.2); // Center-to-edge
+          this.scene.matter.add.constraint(this.center, particleA, radius, 0.2); // Center-to-edge
         }
 
 
@@ -120,6 +120,15 @@
             }
         });
 
+             // Add collision-based check
+             this.scene.time.addEvent({
+              delay: 100, // Check every 100 ms
+              loop: true,
+              callback: () => {
+                this.checkParticleCollisions();
+      }
+          });
+
         // Add lighting and mouse controls
         phaser3d.add.hemisphereLight({ skyColor: 0xddeeff, groundColor: 0x808080, intensity: 2 });
         phaser3d.add.directionalLight({ intensity: 1, x: 100, y: 100, z: 100 });
@@ -129,6 +138,47 @@
 
 
     }
+
+    checkParticleCollisions() {
+      const particleRadius = 10 * 0.50; 
+      let hasCollision = false;
+
+      // Check for overlap
+      for (let i = 0; i < this.particles.length; i++) {
+          for (let j = i + 1; j < this.particles.length; j++) {
+              const particleA = this.particles[i];
+              const particleB = this.particles[j];
+
+              const dx = particleA.position.x - particleB.position.x;
+              const dy = particleA.position.y - particleB.position.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+
+              if (distance < particleRadius * 2) {
+                  hasCollision = true;
+                  break;
+              }
+          }
+          if (hasCollision) break;
+      }
+
+      if (hasCollision) {
+          this.rearrangeParticles();
+      }
+  }
+
+  rearrangeParticles() {
+      const radius = 50; 
+
+     
+      for (let i = 1; i < this.particles.length; i++) {
+          const angle = ((i - 1) / (this.particles.length - 1)) * Math.PI * 2;
+          const x = this.center.position.x + radius * Math.cos(angle);
+          const y = this.center.position.y + radius * Math.sin(angle);
+
+          this.scene.matter.body.setPosition(this.particles[i], { x, y });
+          this.scene.matter.body.setVelocity(this.particles[i], { x: 0, y: 0 });
+      }
+  }
 
     updateThief() {
       let totalParticles = 10;

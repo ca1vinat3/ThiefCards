@@ -1,5 +1,6 @@
-class actionSequence {
-    constructor({functions = [],sequence = "linear",timeBased = false,strictLinear = false,delay = 1000, }) {
+export default class actionSequence {
+    constructor({scene,functions = [],sequence = "linear",timeBased = false,strictLinear = false,delay = 1000, }) {
+        this.scene = scene;
       this.functions = functions;
       this.sequenceType = sequence;
       this.timeBased = timeBased;
@@ -39,7 +40,7 @@ class actionSequence {
       return new Promise((resolve) => {
         const func = this.functions[index];
         if (func) {
-          func();
+          func(this.scene);
         }
   
         if (this.timeBased) {
@@ -59,7 +60,7 @@ class actionSequence {
   
       const func = this.functions[index];
       if (func) {
-        func();
+        func(this.scene);
         this.userSequence.push(index);
   
         if (this.strictLinear) {

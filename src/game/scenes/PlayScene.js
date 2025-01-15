@@ -2,6 +2,7 @@ import { Scene } from 'phaser'
 import { ball } from '../Cards/ball'
 import { rotatePlatform } from '../Cards/rotatePlatform';
 import  actionSequence  from '../Cards/actionSequence';
+import JoyStick from '../Cards/joyStick';
 
 export default class PlayScene extends Scene {
   constructor () {
@@ -64,7 +65,13 @@ export default class PlayScene extends Scene {
 
     */
 
+    //  joystick 
+
+    this.myJoystick = new JoyStick(this,400,300,100,this.circleTwo);
     
+
+    // action sequence
+
     this.myActionSequence =  new actionSequence({
       scene: this,
       functions: [this.action1, this.action2, this.action3],
@@ -91,13 +98,13 @@ export default class PlayScene extends Scene {
   createCircles()
   {
     this.circleOne = this.add.sprite(150, 300, 'circleOne');
-    this.circleOne.setScale(0.3);
+    this.circleOne.setScale(0.1);
     this.circleOne.setInteractive();
     this.circleTwo = this.add.sprite(400, 300, 'circleTwo');
-    this.circleTwo.setScale(0.3);
+    this.circleTwo.setScale(0.1);
     this.circleTwo.setInteractive();
     this.circleThree = this.add.sprite(650, 300, 'circleThree');
-    this.circleThree.setScale(0.3);
+    this.circleThree.setScale(0.1);
     this.circleThree.setInteractive();
 
     this.circleOne.on('pointerdown', () => {
@@ -172,6 +179,8 @@ export default class PlayScene extends Scene {
   update () {
 
    if(this.myActionSequence){console.log("we followed the sequence",this.myActionSequence.checkUserSequence());}
+
+   this.myJoystick.update();
 
   }
 }

@@ -1,112 +1,142 @@
 export default class SpawnObjects {
-    constructor(scene, sourceX, sourceY, texture, objectCount, isPhysicsEnabled, speed, targetObject) {
+    constructor(scene, source, texture, objectCount, isPhysicsEnabled, speed, targetObject) {
         this.scene = scene;
-        this.x = sourceX;
-        this.y = sourceY;
+        this.x = source.x;
+        this.y = source.y;
+        this.mySource = source;
         this.texture = texture;
         this.isPhysicsEnabled = isPhysicsEnabled;
         this.speed = speed;
         this.targetObject = targetObject;
         this.objectCount = objectCount;
 
-        this.objectPool = []; // Pool of reusable objects
-        this.activeObjects = []; // Currently active objects
+        this.objectsGroup = this.scene.add.group({
+            maxSize: this.objectCount,
+            runChildUpdate: true
+        });
 
         this.initializePool();
+        this.scene.events.on('update', this.updateObjects, this);
     }
 
-    // Initialize pool
+    // Initialize the object pool using Phaser groups
     initializePool() {
         for (let i = 0; i < this.objectCount; i++) {
             let object;
 
             if (this.isPhysicsEnabled) {
-                object = this.scene.matter.add.sprite(this.x, this.y, this.texture);
-                object.setActive(false).setVisible(false); // Initially inactive
+                object = this.scene.matter.add.sprite(this.x, this.y, this.texture).setScale(0.1);
+                object.setActive(false).setVisible(false);
+                object.world.remove(object.body);
             } else {
-                object = this.scene.add.sprite(this.x, this.y, this.texture);
-                object.setActive(false).setVisible(false); // Initially inactive
+                object = this.scene.add.sprite(this.x, this.y, this.texture).setScale(0.1);
+                object.setActive(false).setVisible(false);
             }
 
-            this.objectPool.push(object);
+            this.objectsGroup.add(object);
         }
     }
 
-    // Get from the pool or return null if none available
-    getObjectFromPool() {
-        if (this.objectPool.length > 0) {
-            return this.objectPool.pop();
-        }
-        return null; 
-    }
-
-    // Return to the pool
-    returnObjectToPool(object) {
-        object.setActive(false).setVisible(false);
-        if (this.isPhysicsEnabled) {
-            object.setPosition(this.x, this.y); // Reset position
-            object.setVelocity(0, 0); // Reset physics velocity
-        } else {
-            object.setPosition(this.x, this.y); // Reset position
-        }
-        this.objectPool.push(object);
-    }
-
-    // Spawn  and optionally make it follow a target
     spawn() {
-        const object = this.getObjectFromPool();
+        const object = this.objectsGroup.getFirstDead();
 
         if (object) {
             object.setActive(true).setVisible(true);
+            object.setPosition(this.x, this.y);
 
-            if (this.targetObject) {
-                this.scene.tweens.add({
-                    targets: object,
-                    x: this.targetObject.x,
-                    y: this.targetObject.y,
-                    duration: this.speed,
-                    onComplete: () => {
-                        this.returnObjectToPool(object);
-                    },
-                });
-            } else {
-                // Move the object in a default direction (e.g., straight up)
-                if (this.isPhysicsEnabled) {
-                    object.setVelocity(0, -this.speed);
-                } else {
-                    this.scene.tweens.add({
-                        targets: object,
-                        y: object.y - this.speed * 100,
-                        duration: 1000,
-                        onComplete: () => {
-                            this.returnObjectToPool(object);
-                        },
-                    });
-                }
+            if (this.isPhysicsEnabled) {
+                object.world.add(object.body);
             }
-
-            this.activeObjects.push(object);
         }
     }
 
-    //  handle inactive objects out-of-bounds 
+    updateObjects() {
+
+        this.x = this.mySource.x;
+        this.y = this.mySource.y;
+        this.objectsGroup.children.iterate((object) => {
+            if (object.active && this.targetObject) {
+                const angle = Phaser.Math.Angle.Between(object.x, object.y, this.targetObject.x, this.targetObject.y);
+                const velocityX = Math.cos(angle) * this.speed;
+                const velocityY = Math.sin(angle) * this.speed;
+
+                if (this.isPhysicsEnabled) {
+                    object.setVelocity(velocityX, velocityY);
+                } else {
+                    object.x += velocityX;
+                    object.y += velocityY;
+                }
+
+                // Deactivate the object if it reaches the target
+                const distance = Phaser.Math.Distance.Between(object.x, object.y, this.targetObject.x, this.targetObject.y);
+                if (distance < 5) { // Adjust threshold as needed
+                    this.deactivateObject(object);
+                }
+            }
+        });
+    }
+
+    // Spawn an object from the pool
+    // spawn() {
+    //     const object = this.objectsGroup.getFirstDead();
+
+    //     if (object) {
+    //         object.setActive(true).setVisible(true);
+    //         object.setPosition(this.x, this.y);
+
+    //         if (this.isPhysicsEnabled) {
+    //             object.world.add(object.body);
+    //         }
+
+    //         // Continuously update the object's position to follow the target
+    //         this.scene.events.on('update', () => {
+    //             if (object.active && this.targetObject) {
+    //                 const angle = Phaser.Math.Angle.Between(object.x, object.y, this.targetObject.x, this.targetObject.y);
+    //                 let  velocityX = Math.cos(angle) * this.speed;
+    //                 let  velocityY = Math.sin(angle) * this.speed;
+
+    //                 if (this.isPhysicsEnabled) {
+    //                     object.setVelocity(velocityX, velocityY);
+    //                 } else {
+    //                     object.x += velocityX;
+    //                     object.y += velocityY;
+    //                 }
+
+    //                 // Check if the object has reached the target
+    //                 const distance = Phaser.Math.Distance.Between(object.x, object.y, this.targetObject.x, this.targetObject.y);
+    //                 if (distance < 5) { // Adjust threshold as needed
+    //                     this.deactivateObject(object);
+    //                     velocityX = 0;
+    //                     velocityY = 0;
+    //                     object.x = 0;
+    //                     object.y = 0;
+    //                 }
+    //             }
+    //         });
+    //     }
+    // }
+
+    // Deactivate an object and return it to the pool
+    deactivateObject(object) {
+        object.setActive(false).setVisible(false);
+        if (this.isPhysicsEnabled) {
+            object.setVelocity(0, 0); // Reset physics velocity
+            object.world.remove(object.body);
+        }
+    }
+
+    // Update logic to handle inactive objects (e.g., out-of-bounds objects)
     update() {
-        this.activeObjects = this.activeObjects.filter((object) => {
+        this.objectsGroup.children.iterate((object) => {
             if (object.active) {
-                // Check if the object is out of bounds
                 if (
                     object.x < 0 ||
                     object.x > this.scene.sys.canvas.width ||
                     object.y < 0 ||
                     object.y > this.scene.sys.canvas.height
                 ) {
-                    this.returnObjectToPool(object);
-                    return false; // Remove from active objects list
+                    this.deactivateObject(object);
                 }
-                return true; // Keep active
-            } else {
-                this.returnObjectToPool(object);
-                return false;
             }
         });
     }

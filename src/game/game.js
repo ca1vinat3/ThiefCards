@@ -11,7 +11,7 @@ function launch(containerId) {
     physics: {
       default: 'matter',
       matter: {
-        gravity: { y: 3 },
+        gravity: { y: 0 },
         debug: true
       }
     },

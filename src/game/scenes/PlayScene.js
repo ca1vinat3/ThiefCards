@@ -3,6 +3,7 @@ import { ball } from '../Cards/ball'
 import { rotatePlatform } from '../Cards/rotatePlatform';
 import  actionSequence  from '../Cards/actionSequence';
 import JoyStick from '../Cards/joyStick';
+import spawnObject from '../Cards/spawnObject';
 
 export default class PlayScene extends Scene {
   constructor () {
@@ -64,10 +65,14 @@ export default class PlayScene extends Scene {
     this.matter.world.setBounds(0, 0, this.scale.width, this.scale.height);
 
     */
+    //spawn object
+
+    this.mySpawnedObject = new spawnObject(this, this.circleThree, 'circleOne', 3, true ,5, this.circleTwo);
+
 
     //  joystick 
 
-    this.myJoystick = new JoyStick(this,400,300,100,this.circleTwo);
+    this.myJoystick = new JoyStick(this,400,300,100,this.circleThree);
     
 
     // action sequence
@@ -85,8 +90,10 @@ export default class PlayScene extends Scene {
 
     this.input.keyboard.on('keydown-SPACE', () => {
 
-      this.myActionSequence.reset();
-      this.myActionSequence.runSequence();
+      // this.myActionSequence.reset();
+      // this.myActionSequence.runSequence();
+
+      this.mySpawnedObject.spawn();
 
     })
 
@@ -178,7 +185,7 @@ export default class PlayScene extends Scene {
 
   update () {
 
-   if(this.myActionSequence){console.log("we followed the sequence",this.myActionSequence.checkUserSequence());}
+   //if(this.myActionSequence){console.log("we followed the sequence",this.myActionSequence.checkUserSequence());}
 
    this.myJoystick.update();
 

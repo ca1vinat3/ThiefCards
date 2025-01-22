@@ -67,9 +67,11 @@ export default class PlayScene extends Scene {
     */
     //spawn object
 
-    this.mySpawnedObject = new spawnObject(this, this.circleThree, 'circleOne', 3, true ,5, this.circleTwo);
+    
 
+    this.mySpawnedEnemy = new spawnObject(this, this.circleOne, 'circleTwo', 100, false ,1, this.circleThree,"enemy","fromAround");
 
+    this.mySpawnedObject = new spawnObject(this, this.circleThree, 'circleOne', 3, false ,1, this.mySpawnedEnemy.closeEnemy,"bullet");
     //  joystick 
 
     this.myJoystick = new JoyStick(this,400,300,100,this.circleThree);
@@ -94,8 +96,13 @@ export default class PlayScene extends Scene {
       // this.myActionSequence.runSequence();
 
       this.mySpawnedObject.spawn();
+     
 
     })
+
+    setInterval(() => {
+      this.mySpawnedEnemy.spawn();
+    }, 500);
 
     
 

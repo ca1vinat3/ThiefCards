@@ -69,10 +69,21 @@ export default class PlayScene extends Scene {
 
     
 
-    this.mySpawnedEnemy = new spawnObject(this, this.circleOne, 'circleTwo', 100, false ,1, this.circleThree,"enemy","fromAround");
+    this.mySpawnedEnemy = new spawnObject(this, this.circleOne, 'circleTwo', 5, false ,0.5, this.circleThree,"enemy","fromAround");
 
-    this.mySpawnedObject = new spawnObject(this, this.circleThree, 'circleOne', 3, false ,1, this.mySpawnedEnemy.closeEnemy,"bullet");
+    setTimeout(() => {
+
+      this.mySpawnedObject = new spawnObject(this, this.circleThree, 'circleOne', 5, false ,1, this.mySpawnedEnemy,"bullet");
+      
+    }, 1500);
+
+  
     //  joystick 
+
+
+    setInterval(() => {
+      console.log(this.mySpawnedEnemy.closeEnemy);
+    }, 1000);
 
     this.myJoystick = new JoyStick(this,400,300,100,this.circleThree);
     
@@ -111,10 +122,10 @@ export default class PlayScene extends Scene {
 
   createCircles()
   {
-    this.circleOne = this.add.sprite(150, 300, 'circleOne');
+    this.circleOne = this.add.sprite(150, 300, 'circleOne').setAlpha(0);
     this.circleOne.setScale(0.1);
     this.circleOne.setInteractive();
-    this.circleTwo = this.add.sprite(400, 300, 'circleTwo');
+    this.circleTwo = this.add.sprite(400, 300, 'circleTwo').setAlpha(0);
     this.circleTwo.setScale(0.1);
     this.circleTwo.setInteractive();
     this.circleThree = this.add.sprite(650, 300, 'circleThree');

@@ -3,12 +3,12 @@ export default class SpawnObjects {
         this.scene = scene;
         this.x = source.x;
         this.y = source.y;
-        this.closeEnemy;
         this.mySource = source;
         this.texture = texture;
         this.isPhysicsEnabled = isPhysicsEnabled;
         this.speed = speed;
-        this.targetObject = targetObject;
+
+        this.targetObject = targetObject; // Target can be another SpawnObjects instance
         this.objectCount = objectCount;
         this.type = type; // 'bullet' or 'enemy'
         this.spawnDirection = spawnDirection; // 'fromAround', 'fromBelow', etc.
@@ -40,6 +40,7 @@ export default class SpawnObjects {
         }
     }
 
+    // Spawn a new object from the pool
     spawn() {
         const object = this.objectsGroup.getFirstDead();
 
@@ -47,11 +48,10 @@ export default class SpawnObjects {
             object.setActive(true).setVisible(true);
 
             if (this.type === "enemy") {
-                // Set position based on spawnDirection
                 switch (this.spawnDirection) {
                     case "fromAround":
                         const angle = Phaser.Math.Between(0, 360);
-                        const radius = 300; // Spawn radius
+                        const radius = 500; // Spawn radius
                         object.setPosition(
                             this.targetObject.x + radius * Math.cos(Phaser.Math.DegToRad(angle)),
                             this.targetObject.y + radius * Math.sin(Phaser.Math.DegToRad(angle))
@@ -91,7 +91,6 @@ export default class SpawnObjects {
                         break;
                 }
             } else if (this.type === "bullet") {
-                // Bullets spawn from the source
                 object.setPosition(this.x, this.y);
             }
 
@@ -101,37 +100,76 @@ export default class SpawnObjects {
         }
     }
 
+    // Find the closest active enemy
+    findClosestEnemy() {
+        let closestEnemy = null;
+        let closestDistance = Infinity;
+        this.objectsGroup.children.iterate((myobject) => {
+            if (myobject.active) {
+        if (this.targetObject && this.targetObject.objectsGroup) {
+            this.targetObject.objectsGroup.children.iterate((object) => {
+                if (object.active) {
+                    const distance = Phaser.Math.Distance.Between(myobject.x, myobject.y, object.x, object.y);
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestEnemy = object;
+                    }
+                }
+            });
+        }
+    }});
+        return closestEnemy;
+    }
+
+    // Update the objects
     updateObjects() {
         this.x = this.mySource.x;
         this.y = this.mySource.y;
 
         this.objectsGroup.children.iterate((object) => {
-            if (object.active && this.targetObject) {
-                const angle = Phaser.Math.Angle.Between(object.x, object.y, this.targetObject.x, this.targetObject.y);
-                const velocityX = Math.cos(angle) * this.speed;
-                const velocityY = Math.sin(angle) * this.speed;
+            if (object.active) {
+                let currentTarget;
 
-                if (this.isPhysicsEnabled) {
-                    object.setVelocity(velocityX, velocityY);
-                } else {
-                    object.x += velocityX;
-                    object.y += velocityY;
+                // For bullets, dynamically find the closest enemy
+                if (this.type === "bullet") {
+                    currentTarget = this.findClosestEnemy();
                 }
 
-                // Deactivate the object if it reaches the target
-                const distance = Phaser.Math.Distance.Between(object.x, object.y, this.targetObject.x, this.targetObject.y);
-                if (distance < 20) { // Adjust threshold as needed
-                    this.deactivateObject(object);
-                   // this.targetObject.destroy();
+                // For enemies, use the static target
+                if (this.type === "enemy") {
+                    currentTarget = this.targetObject;
                 }
-                if (distance < 50) { // Adjust threshold as needed
-                
-                    this.closeEnemy = object
+
+                if (currentTarget) {
+                    const angle = Phaser.Math.Angle.Between(object.x, object.y, currentTarget.x, currentTarget.y);
+                    const velocityX = Math.cos(angle) * this.speed;
+                    const velocityY = Math.sin(angle) * this.speed;
+
+                    if (this.isPhysicsEnabled) {
+                        object.setVelocity(velocityX, velocityY);
+                    } else {
+                        object.x += velocityX;
+                        object.y += velocityY;
+                    }
+
+                    // Deactivate the object if it reaches the target
+                    const distance = Phaser.Math.Distance.Between(object.x, object.y, currentTarget.x, currentTarget.y);
+                    if (distance < 20) {
+                        this.deactivateObject(object);
+                      
+
+                        if(this.targetObject.objectsGroup){
+                            this.targetObject.deactivateObject(currentTarget);
+                        }else{
+                            currentTarget.destroy();
+                        }
+                    }
                 }
             }
         });
     }
 
+    // Deactivate an object
     deactivateObject(object) {
         object.setActive(false).setVisible(false);
         if (this.isPhysicsEnabled) {
@@ -140,6 +178,7 @@ export default class SpawnObjects {
         }
     }
 
+    // Clean up objects that leave the screen bounds
     update() {
         this.objectsGroup.children.iterate((object) => {
             if (object.active) {

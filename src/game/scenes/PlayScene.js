@@ -9,13 +9,14 @@ export default class PlayScene extends Scene {
   constructor () {
     super({ key: 'PlayScene' })
     this.platforms = [];
+    this.spawn = false;
   }
 
 
 
   create () {
     this.add.image(400, 300, 'background');
-
+    
     this.createCircles();
 
 /*
@@ -74,7 +75,7 @@ export default class PlayScene extends Scene {
     setTimeout(() => {
 
       this.mySpawnedObject = new spawnObject(this, this.circleThree, 'circleOne', 5, false ,1, this.mySpawnedEnemy,"bullet");
-      
+      this.spawn = true;
     }, 1500);
 
   
@@ -105,9 +106,9 @@ export default class PlayScene extends Scene {
 
       // this.myActionSequence.reset();
       // this.myActionSequence.runSequence();
-
+      if(this.spawn){
       this.mySpawnedObject.spawn();
-     
+      }
 
     })
 

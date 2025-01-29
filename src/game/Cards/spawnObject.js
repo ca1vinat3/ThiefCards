@@ -9,7 +9,7 @@ export default class SpawnObjects {
         this.speed = speed;
 
         this.targetObject = targetObject; // Target can be another SpawnObjects instance
-        this.objectCount = objectCount;
+        this.objectCount = this.texture.length;
         this.type = type; // 'bullet' or 'enemy'
         this.spawnDirection = spawnDirection; // 'fromAround', 'fromBelow', etc.
 
@@ -24,20 +24,28 @@ export default class SpawnObjects {
 
     // Initialize the object pool using Phaser groups
     initializePool() {
-        for (let i = 0; i < this.objectCount; i++) {
-            let object;
-
-            if (this.isPhysicsEnabled) {
-                object = this.scene.matter.add.sprite(this.x, this.y, this.texture).setScale(0.1);
-                object.setActive(false).setVisible(false);
-                object.world.remove(object.body);
-            } else {
-                object = this.scene.add.sprite(this.x, this.y, this.texture).setScale(0.1);
-                object.setActive(false).setVisible(false);
+        this.texture.forEach((object) => {
+            object.setActive(false).setVisible(false);
+            if (this.isPhysicsEnabled && object.body) {
+               object.world.remove(object.body);
             }
-
             this.objectsGroup.add(object);
-        }
+        });
+
+        // for (let i = 0; i < this.objectCount; i++) {
+        //     let object;
+
+        //     if (this.isPhysicsEnabled) {
+        //         object = this.scene.matter.add.sprite(this.x, this.y, this.texture).setScale(0.1);
+        //         object.setActive(false).setVisible(false);
+        //         object.world.remove(object.body);
+        //     } else {
+        //         object = this.scene.add.sprite(this.x, this.y, this.texture).setScale(0.1);
+        //         object.setActive(false).setVisible(false);
+        //     }
+
+        //     this.objectsGroup.add(object);
+        // }
     }
 
     // Spawn a new object from the pool
@@ -51,7 +59,7 @@ export default class SpawnObjects {
                 switch (this.spawnDirection) {
                     case "fromAround":
                         const angle = Phaser.Math.Between(0, 360);
-                        const radius = 500; // Spawn radius
+                        const radius = 300; // Spawn radius
                         object.setPosition(
                             this.targetObject.x + radius * Math.cos(Phaser.Math.DegToRad(angle)),
                             this.targetObject.y + radius * Math.sin(Phaser.Math.DegToRad(angle))
@@ -94,7 +102,7 @@ export default class SpawnObjects {
                 object.setPosition(this.x, this.y);
             }
 
-            if (this.isPhysicsEnabled) {
+            if (this.isPhysicsEnabled && object.body) {
                 object.world.add(object.body);
             }
         }
@@ -145,8 +153,12 @@ export default class SpawnObjects {
                     const velocityX = Math.cos(angle) * this.speed;
                     const velocityY = Math.sin(angle) * this.speed;
 
-                    if (this.isPhysicsEnabled) {
-                        object.setVelocity(velocityX, velocityY);
+                    if (this.isPhysicsEnabled && object.body) {
+                        if(object.body){ 
+                        object.setStatic(false); // Ensure the body is dynamic
+                        object.setAwake(); 
+                        object.setVelocity(velocityX, velocityY);}else{console.log("no body");}
+                      
                     } else {
                         object.x += velocityX;
                         object.y += velocityY;
@@ -154,7 +166,7 @@ export default class SpawnObjects {
 
                     // Deactivate the object if it reaches the target
                     const distance = Phaser.Math.Distance.Between(object.x, object.y, currentTarget.x, currentTarget.y);
-                    if (distance < 20) {
+                    if (distance < 60) {
                         this.deactivateObject(object);
                       
 
@@ -172,7 +184,7 @@ export default class SpawnObjects {
     // Deactivate an object
     deactivateObject(object) {
         object.setActive(false).setVisible(false);
-        if (this.isPhysicsEnabled) {
+        if (this.isPhysicsEnabled && object.body) {
             object.setVelocity(0, 0); // Reset physics velocity
             object.world.remove(object.body);
         }

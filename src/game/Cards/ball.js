@@ -1,22 +1,42 @@
- import Phaser3D from "../libs/Phaser3D.js";
+ //import Phaser3D from "../libs/Phaser3D.js";
 
- import * as THREE from 'three';
+ //import * as THREE from 'three';
 
 
   export class ball extends Phaser.GameObjects.GameObject {
-    constructor(scene, x, y, texture) {
+    constructor(scene, x, y,ballObject,justBall) {
      
       super(scene, 'ball');
 
       this.scene = scene;
       this.x = x;
       this.y = y;  
-      this.createBall(scene);
+      this.justBall = justBall;
+      this.ballObject = ballObject;
+
+      if(this.justBall){
+        this.createBall(scene);
+      }else{
+        this.createSquishyBall(scene);
+      }
+     
     
 
     }
 
     createBall(scene) {
+
+      
+
+      this.scene.matter.add.gameObject(this.ballObject, {
+        shape: { type: 'circle', radius: this.ballObject.width/2 }, 
+        restitution: 0.5, 
+      });
+
+    
+    }
+
+    createSquishyBall(scene) {
 /*
     const thief = this.scene.add.sprite(this.x, this.y, 'thief');
     thief.setScale(0.3);
@@ -96,9 +116,39 @@
             }
         });
 
+         // Create a graphics object to represent the mesh (ball surface)
+         this.graphics = this.scene.add.graphics();
+         this.graphics.setAlpha(1);
+         this.graphics.fillStyle(0xffffff, 1);
+
+           // Update the mesh vertices to follow particle this.positions
+        this.scene.time.addEvent({
+          delay: 16,
+          loop: true,
+          callback: () => {
+                      // Clear the previous mesh
+                this.graphics.clear();
+
+                // Begin drawing a new mesh based on the particles
+                this.graphics.beginPath();
+
+                if (this.particles.length > 0) {
+                  this.graphics.moveTo(this.particles[0].position.x, this.particles[0].position.y);
+                  for (let i = 1; i < this.particles.length; i++) {
+                      this.graphics.lineTo(this.particles[i].position.x, this.particles[i].position.y);
+                  }
+                  this.graphics.lineTo(this.particles[1].position.x, this.particles[1].position.y);
+              }
+                // Close the path and fill
+                this.graphics.closePath();
+                this.graphics.fillPath();
+                this.graphics.strokePath();
+          }
+      });
 
 
-
+//#############REMOVING THREE FOR NOW ############################//
+/*
         // Set up Phaser3D and create the mesh
         const phaser3d = new Phaser3D(this.scene, { fov: 35, x: 0.5, y: 0.5, z: 8.5, anisotropy: 16 });
         const circleMesh = phaser3d.add.circle({
@@ -120,6 +170,14 @@
             }
         });
 
+
+         // Add lighting and mouse controls
+         phaser3d.add.hemisphereLight({ skyColor: 0xddeeff, groundColor: 0x808080, intensity: 2 });
+         phaser3d.add.directionalLight({ intensity: 1, x: 100, y: 100, z: 100 });
+        // this.scene.matter.add.mouseSpring();
+
+
+        */
              // Add collision-based check
              this.scene.time.addEvent({
               delay: 100, // Check every 100 ms
@@ -129,10 +187,7 @@
       }
           });
 
-        // Add lighting and mouse controls
-        phaser3d.add.hemisphereLight({ skyColor: 0xddeeff, groundColor: 0x808080, intensity: 2 });
-        phaser3d.add.directionalLight({ intensity: 1, x: 100, y: 100, z: 100 });
-       // this.scene.matter.add.mouseSpring();
+       
 
 
 

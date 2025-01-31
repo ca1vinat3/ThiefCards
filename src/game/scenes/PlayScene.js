@@ -11,8 +11,8 @@ export default class PlayScene extends Scene {
 
 
   create () {
-    this.add.image(400, 300, 'background');
-
+   // this.add.image(400, 300, 'background');
+   this.ball = this.add.image(400, 300, 'thief');
 
     let rows = 4; // Number of rows
     let cols = 4; // Number of columns
@@ -55,7 +55,7 @@ export default class PlayScene extends Scene {
     
     this.myRotatingPlatforms = new rotatePlatform(this,this.platforms, 400, 300,true,true,null);
 
-    this.myThief = new ball(this, 400, 200, 'thief');
+    this.myThief = new ball(this, 400, 200, this.ball, false);
 
     this.matter.world.setBounds(0, 0, this.scale.width, this.scale.height);
   

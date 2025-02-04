@@ -24,8 +24,8 @@ export default class PlayScene extends Scene {
     this.createCircles();
 
 
-    let rows = 2; // Number of rows
-    let cols = 2; // Number of columns
+    let rows = 5; // Number of rows
+    let cols = 5; // Number of columns
     let spacingX = 50; // Horizontal spacing between platforms
     let spacingY =50; // Vertical spacing between platforms
     let startX = 200; // Starting X position
@@ -73,7 +73,7 @@ export default class PlayScene extends Scene {
       this.input.setDraggable(platform2);
       // Set a random starting angle (in radians)
       let randomAngle2 = Phaser.Math.FloatBetween(0, Math.PI * 2);
-      platform2.setRotation(randomAngle2);
+      //platform2.setRotation(randomAngle2);
 
         // Add the platform to the array
         this.platforms.push(platform);
@@ -94,11 +94,11 @@ export default class PlayScene extends Scene {
 
     
 
-    this.mySpawnedEnemy = new spawnObject(this, this.circleOne, this.platforms, 5, false ,0.5, this.circleThree,"enemy","fromAround");
+    this.mySpawnedEnemy = new spawnObject(this, this.circleOne, this.platforms, 5, false ,0.1, this.circleThree,"enemy","fromAround",false);
 
     setTimeout(() => {
 
-      this.mySpawnedObject = new spawnObject(this, this.circleThree, this.platforms2, 5, true ,1, this.mySpawnedEnemy,"bullet");
+      this.mySpawnedObject = new spawnObject(this, this.circleThree, this.platforms2, 5, true ,3, this.mySpawnedEnemy,"bullet",null,false);
       this.spawn = true;
     }, 1500);
 

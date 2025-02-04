@@ -1,5 +1,5 @@
 export default class SpawnObjects {
-    constructor(scene, source, texture, objectCount, isPhysicsEnabled, speed, targetObject, type, spawnDirection) {
+    constructor(scene, source, texture, objectCount, isPhysicsEnabled, speed, targetObject, type, spawnDirection,ShootStraight) {
         this.scene = scene;
         this.x = source.x;
         this.y = source.y;
@@ -7,6 +7,7 @@ export default class SpawnObjects {
         this.texture = texture;
         this.isPhysicsEnabled = isPhysicsEnabled;
         this.speed = speed;
+        this.ShootStraight = ShootStraight;
 
         this.targetObject = targetObject; // Target can be another SpawnObjects instance
         this.objectCount = this.texture.length;
@@ -51,6 +52,7 @@ export default class SpawnObjects {
     // Spawn a new object from the pool
     spawn() {
         const object = this.objectsGroup.getFirstDead();
+        this.angle = this.mySource.rotation;
 
         if (object) {
             object.setActive(true).setVisible(true);
@@ -100,10 +102,26 @@ export default class SpawnObjects {
                 }
             } else if (this.type === "bullet") {
                 object.setPosition(this.x, this.y);
+                object.initialAngle = this.angle;
             }
 
             if (this.isPhysicsEnabled && object.body) {
                 object.world.add(object.body);
+            }
+
+            if (this.type === "bullet") {
+                // const angle = Phaser.Math.RadToDeg(this.mySource.rotation);
+                // const velocityX = Math.cos(angle) * this.speed;
+                // const velocityY = Math.sin(angle) * this.speed;
+
+                    // object.x += velocityX;
+                    // object.y += velocityY;
+
+                //     const oppositeAngle = this.angle + Math.PI; // Fire in the opposite direction
+                //    let velocityX = Math.cos(oppositeAngle) * this.speed;
+                //   let  velocityY = Math.sin(oppositeAngle) * this.speed;
+
+                //     object.setVelocity(velocityX, velocityY)
             }
         }
     }
@@ -131,8 +149,10 @@ export default class SpawnObjects {
 
     // Update the objects
     updateObjects() {
+        this.update();
         this.x = this.mySource.x;
         this.y = this.mySource.y;
+      
 
         this.objectsGroup.children.iterate((object) => {
             if (object.active) {
@@ -148,7 +168,7 @@ export default class SpawnObjects {
                     currentTarget = this.targetObject;
                 }
 
-                if (currentTarget) {
+                if (currentTarget && !this.ShootStraight) {
                     const angle = Phaser.Math.Angle.Between(object.x, object.y, currentTarget.x, currentTarget.y);
                     const velocityX = Math.cos(angle) * this.speed;
                     const velocityY = Math.sin(angle) * this.speed;
@@ -177,6 +197,35 @@ export default class SpawnObjects {
                         }
                     }
                 }
+
+                if (this.type === "bullet" && this.ShootStraight) {
+                    // const angle = Phaser.Math.RadToDeg(this.mySource.rotation);
+                    // const velocityX = Math.cos(angle) * this.speed;
+                    // const velocityY = Math.sin(angle) * this.speed;
+    
+                     
+    
+                        const oppositeAngle = object.initialAngle; // Fire in the opposite direction
+                      //  console.log(oppositeAngle);
+                        console.log(Phaser.Math.RadToDeg(oppositeAngle));
+                       let velocityX = Math.cos(oppositeAngle) * this.speed;
+                      let  velocityY = Math.sin(oppositeAngle) * this.speed;
+    
+                      //  object.setVelocity(velocityX, velocityY)
+                           object.x += velocityX;
+                        object.y += velocityY;
+                }
+                if (this.type === "bullet" && this.targetObject && this.targetObject.objectsGroup) {
+                    this.targetObject.objectsGroup.children.iterate((enemy) => {
+                        if (enemy.active && Phaser.Math.Distance.Between(object.x, object.y, enemy.x, enemy.y) < 40) {
+                            this.deactivateObject(object);
+                            this.deactivateObject(enemy);
+                        }
+                    });
+                }
+               
+
+
             }
         });
     }
@@ -192,6 +241,9 @@ export default class SpawnObjects {
 
     // Clean up objects that leave the screen bounds
     update() {
+        if(this.type === "bullet"){
+        
+       
         this.objectsGroup.children.iterate((object) => {
             if (object.active) {
                 if (
@@ -204,5 +256,7 @@ export default class SpawnObjects {
                 }
             }
         });
+
+    }
     }
 }

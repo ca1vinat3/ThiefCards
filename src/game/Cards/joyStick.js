@@ -167,16 +167,50 @@ export default class JoyStick {
       }
   
     // Update the gameObject position 
-    update() {
-      if (this.gameObject) {
-        const moveSpeed = this.magnitude * 200; // Scale speed by magnitude
+   update() {
+  if (this.gameObject) {
+    const moveSpeed = this.magnitude * 200; // Scale speed by magnitude
+
+    // Define 8-directional snapping
+    const directions = [
+      { min: -22.5, max: 22.5, angle: 0 },    // Right
+      { min: 22.5, max: 67.5, angle: 45 },    // Up-Right
+      { min: 67.5, max: 112.5, angle: 90 },   // Up
+      { min: 112.5, max: 157.5, angle: 135 }, // Up-Left
+      { min: 157.5, max: 180, angle: 180 },   // Left
+      { min: -180, max: -157.5, angle: 180 }, // Left (negative range)
+      { min: -157.5, max: -112.5, angle: -135 }, // Down-Left
+      { min: -112.5, max: -67.5, angle: -90 }, // Down
+      { min: -67.5, max: -22.5, angle: -45 }, // Down-Right
+    ];
+
+    // Determine the closest predefined direction
+    let snappedAngle = 0;
+    for (const dir of directions) {
+      if (this.angle >= dir.min && this.angle < dir.max) {
+        snappedAngle = dir.angle;
+        break;
+      }
+    }
+
+    // Convert angle to movement vector
+    const rad = Phaser.Math.DegToRad(snappedAngle);
+    const moveX = Math.cos(rad) * moveSpeed * this.scene.game.loop.delta / 1000;
+    const moveY = Math.sin(rad) * moveSpeed * this.scene.game.loop.delta / 1000;
+
+   
         const newX = this.gameObject.x + this.vector.x * moveSpeed * this.scene.game.loop.delta / 1000;
         const newY = this.gameObject.y + this.vector.y * moveSpeed * this.scene.game.loop.delta / 1000;
   
-        this.gameObject.setPosition(newX, newY);
-        this.gameObject.setAngle(this.angle); // Optional: Rotate based on direction
-      }
-    }
+       
+       
+
+    // Move and rotate the gameObject
+    this.gameObject.setPosition(newX, newY);
+    this.gameObject.setAngle(snappedAngle);
+  }
+}
+
   
   
   }

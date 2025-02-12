@@ -4,6 +4,7 @@ import { rotatePlatform } from '../Cards/rotatePlatform';
 import  actionSequence  from '../Cards/actionSequence';
 import JoyStick from '../Cards/joyStick';
 import spawnObject from '../Cards/spawnObject';
+import  match  from '../Cards/match';
 import { sRGBEncoding } from 'three';
 
 export default class PlayScene extends Scene {
@@ -21,19 +22,20 @@ export default class PlayScene extends Scene {
   create () {
     this.add.image(400, 300, 'background');
     
-    this.createCircles();
+   // this.createCircles();
 
 
-    let rows = 5; // Number of rows
-    let cols = 5; // Number of columns
+    let rows = 4; // Number of rows
+    let cols = 4; // Number of columns
     let spacingX = 50; // Horizontal spacing between platforms
     let spacingY =50; // Vertical spacing between platforms
     let startX = 200; // Starting X position
     let startY = 200; // Starting Y position
-
+    let index = 0;
 
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
+       index ++;
         // Calculate position for each platform
         let x = startX + col * spacingX;
         let y = startY + row * spacingY;
@@ -41,6 +43,7 @@ export default class PlayScene extends Scene {
         // Create the platform sprite
         let platform = this.add.sprite(x, y, 'platform');
 
+      
           platform.setDisplaySize(50, 50);
         
         this.matter.add.gameObject(platform, {
@@ -57,31 +60,33 @@ export default class PlayScene extends Scene {
         platform.setRotation(randomAngle);
 
 
-        //second stuff
-        let platform2 = this.add.sprite(x, y, 'platform');
+        if(index % 2 ){platform.setTint(0xff0000);}
 
-        platform2.setDisplaySize(50, 50);
+      //   //second stuff
+      //   let platform2 = this.add.sprite(x, y, 'platform');
+
+      //   platform2.setDisplaySize(50, 50);
       
-      this.matter.add.gameObject(platform2, {
-        shape: { type: 'rectangle', width:50, height: 50 }, 
-        restitution: 0.8, 
-      });
+      // this.matter.add.gameObject(platform2, {
+      //   shape: { type: 'rectangle', width:50, height: 50 }, 
+      //   restitution: 0.8, 
+      // });
 
-      platform2.setIgnoreGravity(true);
-      platform2.setStatic(true);
-      platform2.setInteractive();
-      this.input.setDraggable(platform2);
+      // platform2.setIgnoreGravity(true);
+      // platform2.setStatic(true);
+      // platform2.setInteractive();
+      // this.input.setDraggable(platform2);
       // Set a random starting angle (in radians)
       let randomAngle2 = Phaser.Math.FloatBetween(0, Math.PI * 2);
       //platform2.setRotation(randomAngle2);
 
         // Add the platform to the array
         this.platforms.push(platform);
-        this.platforms2.push(platform2);
+    //    this.platforms2.push(platform2);
       }
     }
 
-    
+    this.myMatchGame = new match(this, 200, 200, this.platforms, true, true);
     
     // this.myRotatingPlatforms = new rotatePlatform(this,this.platforms, 400, 300,true,true,null);
 
@@ -94,23 +99,23 @@ export default class PlayScene extends Scene {
 
     
 
-    this.mySpawnedEnemy = new spawnObject(this, this.circleOne, this.platforms, 5, false ,0.1, this.circleThree,"enemy","fromAround",false);
+    // this.mySpawnedEnemy = new spawnObject(this, this.circleOne, this.platforms, 5, false ,0.1, this.circleThree,"enemy","fromAround",false);
 
-    setTimeout(() => {
+    // setTimeout(() => {
 
-      this.mySpawnedObject = new spawnObject(this, this.circleThree, this.platforms2, 5, true ,3, this.mySpawnedEnemy,"bullet",null,false);
-      this.spawn = true;
-    }, 1500);
+    //   this.mySpawnedObject = new spawnObject(this, this.circleThree, this.platforms2, 5, true ,3, this.mySpawnedEnemy,"bullet",null,false);
+    //   this.spawn = true;
+    // }, 1500);
 
   
     //  joystick 
 
 
-    setInterval(() => {
-      console.log(this.mySpawnedEnemy.closeEnemy);
-    }, 1000);
+    // setInterval(() => {
+    //   console.log(this.mySpawnedEnemy.closeEnemy);
+    // }, 1000);
 
-    this.myJoystick = new JoyStick(this,400,300,100,this.circleThree);
+    // this.myJoystick = new JoyStick(this,400,300,100,this.circleThree);
     
 
     // action sequence
@@ -130,14 +135,14 @@ export default class PlayScene extends Scene {
 
       // this.myActionSequence.reset();
       // this.myActionSequence.runSequence();
-      if(this.spawn){
-      this.mySpawnedObject.spawn();
-      }
+      // if(this.spawn){
+      // this.mySpawnedObject.spawn();
+      // }
 
     })
 
     setInterval(() => {
-      this.mySpawnedEnemy.spawn();
+  //    this.mySpawnedEnemy.spawn();
       //console.log(this.bullets);
     }, 500);
 
@@ -238,7 +243,7 @@ export default class PlayScene extends Scene {
 
    //if(this.myActionSequence){console.log("we followed the sequence",this.myActionSequence.checkUserSequence());}
 
-   this.myJoystick.update();
+  // this.myJoystick.update();
 
   }
 }

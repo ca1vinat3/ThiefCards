@@ -23,16 +23,17 @@ export default class match {
     createPairs() {
       let pairs = [];
       for (let i = 0; i < this.items.length; i += 2) {
-        let id = Math.floor(i / 2); // Ensuring ID consistency for matching pairs
+        let id = Math.floor(i / 4) + 1; // Ensuring each two pairs get the same ID
         pairs.push({
           cover: this.items[i],
           bug: this.items[i + 1],
           matched: false,
-          id: id % (this.items.length / 4) // Ensure paired IDs match
+          id: id
         });
       }
       return pairs;
     }
+    
   
     shufflePairs() {
       let shuffled = [...this.pairs];

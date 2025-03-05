@@ -6,6 +6,7 @@ import JoyStick from '../Cards/joyStick';
 import spawnObject from '../Cards/spawnObject';
 import  match  from '../Cards/match';
 import { sRGBEncoding } from 'three';
+import Uno from '../Cards/uno';
 
 export default class PlayScene extends Scene {
   constructor () {
@@ -15,6 +16,7 @@ export default class PlayScene extends Scene {
     this.spawn = false;
     this.enemies = [];
     this.bullets = [];
+    this.Mycards = [];
   }
 
 
@@ -23,7 +25,7 @@ export default class PlayScene extends Scene {
     this.add.image(400, 300, 'background');
     
    // this.createCircles();
-
+/*
 
     let rows = 4; // Number of rows
     let cols = 4; // Number of columns
@@ -85,8 +87,23 @@ export default class PlayScene extends Scene {
     //    this.platforms2.push(platform2);
       }
     }
+*/
+   
+      this.cardOne = this.add.sprite(0, 0, 'cardOne').setScale(0.3)
+      this.cardTwo = this.add.sprite(0, 0, 'cardTwo').setScale(0.3)
+      this.cardThree = this.add.sprite(0, 0, 'cardThree').setScale(0.3)
+      this.cardFour = this.add.sprite(0, 0, 'cardFour').setScale(0.3)
+   
+     this.Mycards.push(this.cardOne);
+     this.Mycards.push(this.cardTwo);
+      this.Mycards.push(this.cardThree);
+      this.Mycards.push(this.cardFour);
 
-    this.myMatchGame = new match(this, 200, 200, this.platforms, true, true);
+
+    
+    this.unoGame = new Uno(this, 400, 500, this.Mycards, 3,true,true);
+
+ //   this.myMatchGame = new match(this, 200, 200, this.platforms, true, true);
     
     // this.myRotatingPlatforms = new rotatePlatform(this,this.platforms, 400, 300,true,true,null);
 

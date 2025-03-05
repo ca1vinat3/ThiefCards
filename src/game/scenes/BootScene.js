@@ -7,6 +7,10 @@ import circleTwo from '@/game/assets/sprite-03.png'
 import circleThree from '@/game/assets/sprite-04.png'
 import thudMp3 from '@/game/assets/thud.mp3'
 import thudOgg from '@/game/assets/thud.ogg'
+import cardOne from '@/game/assets/card-01.png'
+import cardTwo from '@/game/assets/card-02.png'
+import cardThree from '@/game/assets/card-03.png'
+import cardFour from '@/game/assets/card-04.png'
 
 export default class BootScene extends Scene {
   constructor () {
@@ -21,6 +25,10 @@ export default class BootScene extends Scene {
     this.load.image('circleOne', circleOne)
     this.load.image('circleTwo', circleTwo)
     this.load.image('circleThree', circleThree)
+    this.load.image('cardOne', cardOne)
+    this.load.image('cardTwo', cardTwo)
+    this.load.image('cardThree', cardThree)
+    this.load.image('cardFour', cardFour)
   }
 
   create () {

@@ -5,8 +5,8 @@ import PlayScene from '@/game/scenes/PlayScene'
 function launch(containerId) {
   return new Phaser.Game({
     type: Phaser.WEBGL,
-    width: 800,
-    height: 600,
+    width: 600,
+    height: 800,
     parent: containerId,
     physics: {
       default: 'matter',

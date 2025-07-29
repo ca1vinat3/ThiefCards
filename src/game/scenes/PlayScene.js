@@ -2,6 +2,7 @@ import { Scene } from 'phaser'
 import { ball } from '../Cards/ball'
 import { rotatePlatform } from '../Cards/rotatePlatform';
 import  actionSequence  from '../Cards/actionSequence';
+import pingPong from '../Cards/pingPong';
 
 export default class PlayScene extends Scene {
   constructor () {
@@ -9,12 +10,32 @@ export default class PlayScene extends Scene {
     this.platforms = [];
   }
 
-
-
   create () {
-    this.add.image(400, 300, 'background');
+    this.add.image(300, 400, 'background'); // Centered for portrait
 
-    this.createCircles();
+    // --- SIDE WALLS ---
+    // Left wall
+    this.matter.add.rectangle(0, 400, 20, 800, { isStatic: true });
+    // Right wall
+    this.matter.add.rectangle(600, 400, 20, 800, { isStatic: true });
+    // --- END SIDE WALLS ---
+
+    // --- PONG GAME SETUP ---
+    // Top (enemy/AI) paddle
+    const paddleAI = this.matter.add.sprite(300, 60, 'platform').setDisplaySize(120, 30);
+    // Bottom (player) paddle
+    const paddlePlayer = this.matter.add.sprite(300, 740, 'platform').setDisplaySize(120, 30);
+    const ballSprite = this.matter.add.sprite(300, 400, 'thief').setDisplaySize(40, 40);
+
+    // Make paddles static so they are not pushed by the ball
+    paddleAI.setStatic(true);
+    paddlePlayer.setStatic(true);
+
+    // Create the Pong game (player paddle is bottom, AI is top)
+    this.pong = new pingPong(this, 300, 400, paddlePlayer, paddleAI, ballSprite);
+    // --- END PONG GAME SETUP ---
+
+   // this.createCircles();
 
 /*
     let rows = 4; // Number of rows
